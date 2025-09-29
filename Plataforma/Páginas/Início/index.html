@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet"/>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    
+    <link rel="icon" type="favicon" href="../../Assets/Imagens/Imagem_Color_1.png">
+    <title>HelpEnem - Plataforma do Aluno</title>
+
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="Loading.css">
+</head>
+<body class="fade-in">
+     <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <img src="../../Assets/Imagens/Imagem_Color_1.png" alt="Logo" class="logo-img">
+                </div>
+                <h1>HelpEnem</h1>
+                <p>Acesse a sua conta para continuar estudando!</p>
+            </div>
+            
+            <form class="login-form" id="loginForm" novalidate>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required autocomplete="email">
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password">
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="fi fi-sr-eye eye-open"></i>
+                            <i class="fi fi-sr-eye-crossed eye-closed"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span class="checkmark"></span>
+                        Manter-se Conectado
+                    </label>
+                    <a href="#" class="forgot-link">Esqueci Minha Senha</a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Entrar</span>
+                    <div class="btn-loader">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+ <script>
+    class CleanBankingLoginForm {
+    constructor() {
+        this.form = document.getElementById('loginForm');
+        this.emailInput = document.getElementById('email');
+        this.passwordInput = document.getElementById('password');
+        this.passwordToggle = document.getElementById('passwordToggle');
+        this.submitButton = this.form.querySelector('.login-btn');
+
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.setupPasswordToggle();
+    }
+
+    bindEvents() {
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.emailInput.addEventListener('blur', () => this.validateEmail());
+        this.passwordInput.addEventListener('blur', () => this.validatePassword());
+        this.emailInput.addEventListener('input', () => this.clearError('email'));
+        this.passwordInput.addEventListener('input', () => this.clearError('password'));
+    }
+
+    setupPasswordToggle() {
+        this.passwordToggle.addEventListener('click', () => {
+            const type = this.passwordInput.type === 'password' ? 'text' : 'password';
+            this.passwordInput.type = type;
+
+            this.passwordToggle.classList.toggle('show-password', type === 'text');
+        });
+    }
+
+    validateEmail() {
+        const email = this.emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email) {
+            this.showError('email', 'O endereço de email é obrigatório!');
+            return false;
+        }
+
+        if (!emailRegex.test(email)) {
+            this.showError('email', 'Por favor, insira um endereço de e-mail válido!');
+            return false;
+        }
+
+        this.clearError('email');
+        return true;
+    }
+
+    validatePassword() {
+        const password = this.passwordInput.value;
+
+        if (!password) {
+            this.showError('password', 'A senha é obrigatória!');
+            return false;
+        }
+
+        this.clearError('password');
+        return true;
+    }
+
+    showError(field, message) {
+        const formGroup = document.getElementById(field).closest('.form-group');
+        const errorElement = document.getElementById(`${field}Error`);
+
+        formGroup.classList.add('error');
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+
+    clearError(field) {
+        const formGroup = document.getElementById(field).closest('.form-group');
+        const errorElement = document.getElementById(`${field}Error`);
+
+        formGroup.classList.remove('error');
+        errorElement.classList.remove('show');
+        setTimeout(() => {
+            errorElement.textContent = '';
+        }, 200);
+    }
+
+    async handleSubmit(e) {
+        e.preventDefault();
+
+        const isEmailValid = this.validateEmail();
+        const isPasswordValid = this.validatePassword();
+
+        if (!isEmailValid || !isPasswordValid) {
+            return;
+        }
+
+        const email = this.emailInput.value.trim();
+        const password = this.passwordInput.value;
+
+        const validEmail = 'estudante@helpenem.com';
+        const validPassword = '123456';
+
+        this.setLoading(true);
+
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            if (email === validEmail && password === validPassword) {
+                this.showSuccess();
+            } else {
+                this.showError('password', 'Email ou senha incorretos.');
+            }
+        } catch (error) {
+            this.showError('password', 'Erro ao autenticar. Tente novamente.');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    setLoading(loading) {
+        this.submitButton.classList.toggle('loading', loading);
+        this.submitButton.disabled = loading;
+    }
+
+    showSuccess() {
+        window.location.href = '../Dashboard/Index.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new CleanBankingLoginForm();
+});
+
+ </script>
+</body>
+</html>
